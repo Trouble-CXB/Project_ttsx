@@ -1,0 +1,61 @@
+<div class="main_con clearfix">
+    <div class="left_menu_con clearfix">
+        <h3>用户中心</h3>
+        <ul>
+            <li><a href="/ttsx/userCenterInfo" class="active">· 个人信息</a></li>
+            <li><a href="/ttsx/userCenterOrder">· 全部订单</a></li>
+            <li><a href="/ttsx/userCenterSite">· 收货地址</a></li>
+        </ul>
+    </div>
+    <div class="right_content clearfix">
+        <div class="info_con clearfix">
+            <h3 class="common_title2">基本信息</h3>
+            <ul class="user_info_list">
+                <li><span>用户名：</span>{{.userName}}</li>
+            {{if compare .address ""}}
+                <li>当前用户没有默认联系方式和联系地址</li>
+            {{else}}
+                <li><span>联系方式：</span>{{.address.Phone}}</li>
+                <li><span>联系地址：</span>{{.address.Addr}}</li>
+            {{end}}
+            </ul>
+        </div>
+
+        <h3 class="common_title2">最近浏览</h3>
+        <div class="has_view_list">
+            <ul class="goods_type_list clearfix">
+            {{range .goodsSkus}}
+                <li>
+                    <a href="/goodsDetail?id={{.Id}}"><img src="http://192.168.201.129:8888/{{.Image}}"></a>
+                    <h4><a href="/goodsDetail?id={{.Id}}">{{.Name}}</a></h4>
+                    <div class="operate">
+                        <span class="prize">￥{{.Price}}</span>
+                        <span class="unit">{{.Price}}/{{.Unite}}</span>
+                        <a href="javascript:" class="add_goods" goodsId="{{.Id}}" title="加入购物车"></a>
+                    </div>
+                </li>
+            {{end}}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+<script>
+    $('.add_goods').click(function () {
+        var $goodsId = $(this).attr('goodsId');
+        var $count = 1;
+        var $param = {"goodsId": $goodsId, "count": $count};
+        $.post('/ttsx/addCart', $param, function (data) {
+            if (data.code == 5) {
+                // alert("商品添加购物车成功")
+                $('#show_count').html(data.count);
+            } else {
+                alert(data.code);
+                alert(data.errmsg);
+            }
+        });
+
+
+    })
+</script>

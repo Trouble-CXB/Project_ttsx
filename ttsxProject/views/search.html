@@ -1,0 +1,28 @@
+<div class="main_wrap clearfix">
+    <div class="l_wrap fl clearfix">
+        <div class="new_goods">
+        </div>
+    </div>
+
+    <div class="r_wrap fr clearfix">
+        <ul class="goods_type_list clearfix">
+        {{range .search}}
+            <li>
+                <a href="/goodsDetail?id={{.Id}}"><img src="http://192.168.201.129:8888/{{.Image}}"></a>
+                <h4><a href="/goodsDetail?id={{.Id}}">{{.Name}}</a></h4>
+                <div class="operate">
+                    <span class="prize">￥{{.Price}}</span>
+                    <span class="unit">{{.Price}}/{{.Unite}}</span>
+                    <a href="#" class="add_goods" title="加入购物车"></a>
+                </div>
+            </li>
+        {{end}}
+        </ul>
+
+
+        {{/*<div class="pagenation">*/}}
+            {{/*<a href="/goodsList?id={{.typeId}}&pageIndex={{.prePage}}&sort={{.sort}}">上一页</a>*/}}
+            {{/*<a href="/goodsList?id={{.typeId}}&pageIndex={{.nextPage}}&sort={{.sort}}">下一页</a>*/}}
+        {{/*</div>*/}}
+    </div>
+</div>

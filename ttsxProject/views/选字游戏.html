@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>选字游戏</title>
+		<style type="text/css">
+			* {
+				padding: 0;
+				margin: 0;
+			}
+			.box_1 {
+				width: 750px;
+				position: relative;
+				height: 50px;
+				margin-top: 20px;
+				line-height: 30px;
+			}
+			span{
+				display: inline-block;
+				line-height: 50px;
+				font-size: 20px;
+			}
+			.box_2 {
+				position: absolute;
+				width: 250px;
+				height: 250px;
+				border: 1px solid black;
+				text-align: center;
+				line-height: 250px;
+				top: 200px;
+				left: 50%;
+				margin-left: -125px;
+				font-family: "楷体";
+				font-size: 180px;
+			}
+			li {
+				float: left;
+				width: 148px;
+				height: 148px;
+				list-style: none;
+				text-align: center;
+				line-height: 150px;
+				font-size: 100px;
+				cursor: pointer;
+			}
+			#button{
+				width: 200px;
+				height: 80px;
+				position: relative;
+				top: 400px;
+				left: 50%;
+				margin-left: -100px;
+				background: #83AF9B;
+				font-size: 35px;
+				text-align: center;
+				line-height: 80px;
+				border-radius: 10%;
+				cursor: pointer;
+			}
+		</style>
+
+	</head>
+	<body>
+		&nbsp;游戏规则：<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;根据上面的字的颜色从下面选择正确的字<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;点击下面汉字自动开始
+		<div style="width: 750px; height: 750px;margin: 0 auto;border: 1px solid black;">
+			<div class="box_1">
+				<span style="margin-left: 50px;">剩余时间：</span>
+				<span class="clock">30</span>
+				<span style="margin-left: 400px;">答对数：</span>
+				<span class="score">0</span>
+			</div>
+			<div class="box_2">黑</div>
+			<input onclick="cliThis()" type="button" value="重新开始" id="button" />
+			<ul style="width: 750px; height: 150px;margin-top: 450px;">
+				<li id="opt" onclick="check(0)">绿</li>
+				<li id="opt" onclick="check(1)">黄</li>
+				<li id="opt" onclick="check(2)">黑</li>
+				<li id="opt" onclick="check(3)">蓝</li>
+				<li id="opt" onclick="check(4)">红</li>
+			</ul>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var Center = document.querySelector('.box_2');
+		var List = document.querySelectorAll('#opt');
+		var Clock = document.querySelector('.clock');
+		var Score = document.querySelector('.score');
+		var Texts = ['绿', '黄', '黑', '蓝', '红']; 
+		var Colors = ['green', 'yellow', 'black', 'blue', 'red'];
+		var centerColor;
+		var centerText;
+		var tem = 0;
+		var score = 0; 
+		var time = 30;
+		run();		//初始化
+		//界面变化
+		function run() {
+			var fontArr = getRandArr(0, 4, 5);
+			var colorArr = getRandArr(0, 4, 5);
+			for(var i = 0; i < 5; i++) {
+				List[i].innerText = Texts[fontArr[i]];
+				List[i].style.color = Colors[colorArr[i]];
+			}
+			centerColor = getRandArr(0, 4, 1);
+			centerText = getRandArr(0, 4, 1);
+			Center.innerText = Texts[centerText];
+			Center.style.color = Colors[centerColor];
+		}
+		//选项点击事件
+		function check(i) {
+			var a;
+			if(time <= 0) {
+				return;
+			}
+			if(tem == 0) {
+				tem = 1;
+				a = setInterval(function() {
+					time = time - 0.1;
+					Clock.innerText = time.toFixed(1);
+					if(time < 0) {
+						clearInterval(a);
+						Clock.innerText = 0.0;
+						alert("Game Over!!!")
+					}
+				}, 100);
+			}
+			if(List[i].innerText == Texts[centerColor]) {
+				score++;
+			} else {
+				score--;
+				time --;
+				if(score < 0) {
+					score = 0;
+				}
+				if(time < 0) {
+					Clock.innerText = 0.0;
+					alert("Game Over!!!")
+				}
+			}
+			Score.innerText = score;
+			run();
+		}
+		//取随机数
+		function getRandArr(min, max, len) {
+			var arr = [];
+			var rd;
+			
+			while(arr.length < len) {
+				var temp = true;
+				rd = Math.round(Math.random() * (max - min)) + min;
+				for(var i = 0; i < arr.length; i++) {
+					if(rd == arr[i]) {
+						temp = false;
+						break;
+					}
+				}
+				if(temp) {
+					arr.push(rd)
+				}
+			}
+			return arr;
+		}
+		//重新加载界面
+		function cliThis() {
+			window.location.reload();
+		}
+		
+	</script>
+	
+</html>

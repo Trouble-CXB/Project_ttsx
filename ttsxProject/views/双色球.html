@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>双色球</title>
+		<style type="text/css">
+			#button {
+				padding: 0;
+				border: 0;
+				width: 160px;
+				height: 80px;
+				position: relative;
+				top: 10px;
+				left: 45%;
+				background: yellow;
+				font-size: 30px;
+				font-weight: bolder;
+				text-align: center;
+				line-height: 80px;
+				border-radius: 10%;
+				cursor: pointer;
+				outline: none;
+			}
+			.Ball {
+				width: 100px;
+				height: 100px;
+				background: red;
+				margin-right: 10px;
+				float: left;
+				color: white;
+				font-size: 40px;
+				font-weight: bolder;
+				text-align: center;
+				line-height: 100px;
+				border-radius: 50%;
+			}
+		</style>
+	</head>
+
+	<body style="background: black;">
+		<input onclick="cliThis()" type="button" value="开始抽奖" id="button" />
+		<div style="width: 770px;margin:100px auto;">
+			<div class="Ball" id="red0">1</div>
+			<div class="Ball" id="red1">2</div>
+			<div class="Ball" id="red2">3</div>
+			<div class="Ball" id="red3">4</div>
+			<div class="Ball" id="red4">5</div>
+			<div class="Ball" id="red5">6</div>
+			<div class="Ball" id="blue" style="background: blue;">1</div>
+	</body>
+	<script type="text/javascript">
+
+		var tem = 0; 
+		function cliThis() {
+			if(tem == 0) {
+				tem = 1;
+				document.getElementById("button").value = "暂停";
+				m = setInterval(randomRed , 100)
+				n = setInterval(randomBlue, 100)
+			} else {
+				tem = 0;
+				document.getElementById("button").value = "开始抽奖";
+				clearInterval(m);
+				clearInterval(n);
+			}
+		}
+
+		function randomRed() {
+			var arr = [];
+            var newArr = [];
+            for(var i = 1; i <= 33; i++){
+                arr.push(i);	
+            }
+             for(var i = 0; i < 6; i++){ 
+                var index = Math.floor(Math.random()*arr.length);
+                newArr.push(arr.splice(index, 1));	//每次根据下标剪切一个数到新数组中
+             }
+             for(var i = 0; i < 6; i++)
+            	{
+            		redBall = document.querySelector('#red'+i);
+            		redBall.innerText = newArr[i];
+            	}
+		}
+		function randomBlue(){
+			blue.innerText = Math.ceil(Math.random()*16);
+		}
+	</script>
+
+</html>

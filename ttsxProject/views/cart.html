@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>天天生鲜-购物车</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <style type="text/css">
+        .form_submit {
+            height: 78px;
+            width: 100%;
+            background-color: #aa2631;
+            text-align: center;
+            line-height: 78px;
+            color: #fff;
+            font-size: 24px;
+            outline: none;
+        }
+
+        #stock {
+            width: 100%;
+            top: -43px;
+            left: 85px;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<div class="header_con">
+    <div class="header">
+        <div class="welcome fl">欢迎来到天天生鲜!</div>
+        <div class="fr">
+        {{if compare .userName ""}}
+            <div class="login_btn fl">
+                <a href="/login">登录</a>
+                <span>|</span>
+                <a href="/register">注册</a>
+            </div>
+        {{else}}
+            <div class="login_btn fl">
+                欢迎您：<em>{{.userName}}</em>
+                <span>|</span>
+                <a href="/ttsx/logout">退出登录</a>
+            </div>
+
+        {{end}}
+            <div class="user_link fl">
+                <span>|</span>
+                <a href="/ttsx/userCenterInfo">用户中心</a>
+                <span>|</span>
+                <a href="/ttsx/showCart">我的购物车</a>
+                <span>|</span>
+                <a href="/ttsx/userCenterOrder">我的订单</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="search_bar clearfix">
+    <a href="/" class="logo fl"><img src="/static/images/logo.png"></a>
+    <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
+    <div class="search_con fr">
+        <input type="text" class="input_text fl" name="" placeholder="搜索商品">
+        <input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+</div>
+
+<div class="total_count">全部商品<em>{{.CartCount}}</em>件</div>
+<ul class="cart_list_th clearfix">
+    <li class="col01">商品名称</li>
+    <li class="col02">商品单位</li>
+    <li class="col03">商品价格</li>
+    <li class="col04">数量</li>
+    <li class="col05">小计</li>
+    <li class="col06">操作</li>
+</ul>
+<form action="/ttsx/showOrder" method="post">
+{{range .goods}}
+    <ul class="cart_list_td clearfix">
+        <li class="col01"><input type="checkbox" name="goodsId" value="{{.goodsSku.Id}}" checked></li>
+        <li class="col02"><img src="http://192.168.201.129:8888/{{.goodsSku.Image}}"></li>
+        <li class="col03">{{.goodsSku.Name}}<br><em>{{.goodsSku.Price}}元/{{.goodsSku.Unite}}</em></li>
+        <li class="col04">{{.goodsSku.Unite}}</li>
+        <li class="col05">{{.goodsSku.Price}}元</li>
+        <li class="col06">
+            <div class="num_add" style="position: relative">
+                <a href="javascript:;" class="add fl">+</a>
+                <input type="text" class="num_show fl" goodsId="{{.goodsSku.Id}}" value="{{.count}}">
+                <a href="javascript:;" class="minus fl">-</a>
+                <span id="stock" Stock="{{.goodsSku.Stock}}">库存：<em>{{CalStock .goodsSku.Stock .count}}</em></span>
+            </div>
+
+        </li>
+        <li class="col07">{{.sumPrice}}.00元</li>
+        <li class="col08">
+        {{/*ajax 前台实现删除*/}}
+            <a href="javascript:;" class="delete">【删除-ajax】</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+        {{/*后台实现删除*/}}
+            <a href="/ttsx/deleteCart?goodsId={{.goodsSku.Id}}">【删除-url】</a>
+        </li>
+
+    </ul>
+{{end}}
+    <ul class="settlements">
+        <li class="col01"><input type="checkbox" name="" checked=""></li>
+        <li class="col02">全选</li>
+        <li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>{{.CartCount}}</b>件商品</li>
+    {{/*<li class="col04"><a href="place_order.html">去结算</a></li>*/}}
+        <li class="col04"><input type="submit" class="form_submit" value="去结算"></li>
+    </ul>
+</form>
+<div class="footer">
+    <div class="foot_link">
+        <a href="#">关于我们</a>
+        <span>|</span>
+        <a href="#">联系我们</a>
+        <span>|</span>
+        <a href="#">招聘人才</a>
+        <span>|</span>
+        <a href="#">友情链接</a>
+    </div>
+    <p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
+    <p>电话：010-****888 京ICP备*******8号</p>
+</div>
+</body>
+
+<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+
+<script type="text/javascript">
+    CountTotalPrice();
+
+    //计算商品的总价
+    function CountTotalPrice() {
+        var $totalPrice = 0;
+        $('.cart_list_td').find(':checked').parents('ul').each(function () {
+            var $sumPrice = $(this).children('.col07').text();
+            $sumPrice = parseFloat($sumPrice);
+            $totalPrice = $totalPrice + $sumPrice;
+        });
+        $(".settlements").find('em').text($totalPrice.toFixed(2) + '元');
+        //更新选中商品数量
+        var $checkedCount = $('.cart_list_td').find(':checked').length;
+        $('.total_count').find('em').text($checkedCount);
+        $('.settlements').find('b').text($checkedCount);
+    }
+
+    //计算商品小计并更新总价
+    function ContPrice($this, $count) {
+        var $price = $this.parents('ul').children('.col05').text();
+        $price = parseFloat($price);
+        var $sumPrice = $price * $count;
+        $this.parents('ul').find('.col07').text($sumPrice.toFixed(2) + '元');
+        //更新总价
+        CountTotalPrice();
+    }
+
+
+    //ajax 发送函数
+    $errUpdate = true;
+
+    function AjaxUpdate($count, $goodsId) {
+        $.post('/ttsx/addCart', {'goodsId': $goodsId, "count": $count, "temp": 1}, function (data) {
+            if (data.code != 5) {
+                $errUpdate = false;
+                alert(data.code)
+                alert("数据上传失败");
+            }
+        })
+
+    }
+
+    //增加按钮
+    $('.add').click(function () {
+        var $count = $(this).next().val();
+        $count = parseInt($count) + 1;
+
+        var $stock = $(this).parents('ul').find('#stock').children('em').text();
+        $stock = parseInt($stock) - 1;
+
+        if ($stock < 0) {
+            alert("商品不足，明儿敢早！")
+        } else {
+            var $this = $(this);
+            var $goodsId = $this.next().attr('goodsId');
+            // alert($goodsId);
+            AjaxUpdate($count, $goodsId);
+            if ($errUpdate) {
+                // alert("商品数量++++");
+                //商品数量传到页面
+                $(this).next().val($count);
+                $(this).parents('ul').find('#stock').children('em').text($stock);
+                //调用函数  计算商品小计并更新总价
+                ContPrice($this, $count);
+            } else {
+                alert("请刷新页面后重试");
+            }
+        }
+
+
+    });
+
+    //减少按钮
+    $('.minus').click(function () {
+        var $count = $(this).prev().val();
+        $count = parseInt($count) - 1;
+
+        var $stock = $(this).next().children('em').text();
+        $stock = parseInt($stock) + 1;
+
+        if ($stock < 0) {
+            alert("商品不足，明儿敢早！")
+        } else {
+            if ($count >= 1) {
+                var $this = $(this);
+                var $goodsId = $this.prev().attr('goodsId');
+                // alert($goodsId);
+                AjaxUpdate($count, $goodsId);
+                if ($errUpdate) {
+                    // alert("商品数量----")
+                    //商品数量传到页面
+                    $(this).prev().val($count);
+                    $(this).next().children('em').text($stock);
+                    //调用函数  计算商品小计并更新总价
+                    ContPrice($this, $count);
+                } else {
+                    alert("请刷新页面后重试");
+                }
+            }
+        }
+    });
+
+    //手动输入商品数量   .replace(/\s+/g,"") 去除所有空格   .trim()去除前后所有空格
+    $('.num_show').focus(function () {
+        $preCount = $(this).val()
+    })
+    $('.num_show').blur(function () {
+        var $count = $(this).val().replace(/\s+/g, "");
+        if (isNaN($count) || $count == 0 || parseInt($count) <= 0) {
+            // location.href = "/ttsx/showCart"
+            $(this).val(parseInt($preCount));
+            return
+        }
+
+        var $stock = $(this).parents('ul').find('#stock').attr('stock');
+        $stock = parseInt($stock);
+
+        if (parseInt($stock) >= parseInt($count)) {
+            var $this = $(this);
+            var $goodsId = $this.attr('goodsId');
+            $stock = $stock - parseInt($count);
+            AjaxUpdate($count, $goodsId);
+            if ($errUpdate) {
+                // alert($count)
+                var $stock = $(this).parents('ul').find('#stock').children('em').text($stock);
+                //商品数量传到页面
+                $(this).val(parseInt($count));
+                //调用函数  计算商品小计并更新总价
+                ContPrice($this, $count)
+            } else {
+                alert("请刷新页面后重试");
+            }
+        } else {
+            alert("商品不足，明儿敢早！")
+            // location.href = "/ttsx/showCart"
+            $(this).val(parseInt($preCount));
+        }
+
+    });
+
+    //实现全选效果
+    $('.settlements').find(':checkbox').change(function () {
+        var $is_checked = $('.settlements').find(':checkbox').prop('checked')
+        $('.cart_list_td').find(':checkbox').each(function () {
+            $(this).prop('checked', $is_checked);
+        });
+        CountTotalPrice();
+    });
+
+    //实现选中状态变化
+    $('.cart_list_td').find(':checkbox').change(function () {
+        var $boxCount = $('.cart_list_td').find(':checkbox').length;
+        var $checkedCount = $('.cart_list_td').find(':checked').length;
+        if ($boxCount != $checkedCount) {
+            $('.settlements').find(':checkbox').prop('checked', "");
+        } else {
+            $('.settlements').find(':checkbox').prop('checked', "checked");
+        }
+        CountTotalPrice();
+    });
+
+    //删除商品
+    $('.delete').click(function () {
+        var $goodsId = $(this).parents('ul').find('.num_show').attr('goodsId');
+        var $this = $(this).parents('ul');
+
+        $.post('/ttsx/deleteCart', {"goodsId": $goodsId}, function (data) {
+            // alert(data);
+            if (data.code == 5) {
+                // alert("商品删除成功");
+                //location.href = "/ttsx/showCart"
+                $this.remove();
+                var $isChecked = $this.find(':checkbox').prop('checked');
+                if ($isChecked == true) {
+                    CountTotalPrice();
+                }
+            } else {
+                alert(data.code);
+                alert(data.errmsg);
+            }
+        });
+    })
+
+</script>
+
+
+</html>
